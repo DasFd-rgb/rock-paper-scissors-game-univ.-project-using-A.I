@@ -1,3 +1,5 @@
+ï»¿# domain 2026111828-choi-min-gyu-project.streamlit.app
+
 import streamlit as st
 import random
 import base64
@@ -6,51 +8,51 @@ from PIL import Image
 import streamlit.components.v1 as components
 
 
-st.title("°¡À§¹ÙÀ§º¸ ÇÁ·Î±×·¥")
+st.title("ê°€ìœ„ë°”ìœ„ë³´ í”„ë¡œê·¸ë¨")
 
-# °¡À§, ¹ÙÀ§, º¸
-choice = ["°¡À§", "¹ÙÀ§", "º¸"]
+# ê°€ìœ„, ë°”ìœ„, ë³´
+choice = ["ê°€ìœ„", "ë°”ìœ„", "ë³´"]
 
 
-# ½ÂÆĞ¸¦ È®ÀÎÇÏ´Â ÇÔ¼ö
+# ìŠ¹íŒ¨ë¥¼ í™•ì¸í•˜ëŠ” í•¨ìˆ˜
 def game(user, computer):
     if user == computer:
-        return "¹«½ÂºÎ"
+        return "ë¬´ìŠ¹ë¶€"
 
-    if user == "°¡À§" and computer == "º¸":
-        return "½Â¸®"
+    if user == "ê°€ìœ„" and computer == "ë³´":
+        return "ìŠ¹ë¦¬"
 
-    if user == "¹ÙÀ§" and computer == "°¡À§":
-        return "½Â¸®"
+    if user == "ë°”ìœ„" and computer == "ê°€ìœ„":
+        return "ìŠ¹ë¦¬"
 
-    if user == "º¸" and computer == "¹ÙÀ§":
-        return "½Â¸®"
+    if user == "ë³´" and computer == "ë°”ìœ„":
+        return "ìŠ¹ë¦¬"
 
-    return "ÆĞ¹è"
+    return "íŒ¨ë°°"
 
 
-tab1, tab2 = st.tabs(["±âº» °¡À§¹ÙÀ§º¸", "ÀÌ¹ÌÁö °¡À§¹ÙÀ§º¸"])
+tab1, tab2 = st.tabs(["ê¸°ë³¸ ê°€ìœ„ë°”ìœ„ë³´", "ì´ë¯¸ì§€ ê°€ìœ„ë°”ìœ„ë³´"])
 
 
 # -------------------------------------------------
-# ±âº» °¡À§¹ÙÀ§º¸
+# ê¸°ë³¸ ê°€ìœ„ë°”ìœ„ë³´
 # -------------------------------------------------
 with tab1:
 
-    st.write("°¡À§, ¹ÙÀ§, º¸ Áß ÇÏ³ª¸¦ ¼±ÅÃÇÏ¼¼¿ä.")
+    st.write("ê°€ìœ„, ë°”ìœ„, ë³´ ì¤‘ í•˜ë‚˜ë¥¼ ì„ íƒí•˜ì„¸ìš”.")
 
     col1, col2, col3 = st.columns(3)
 
     user = ""
 
-    if col1.button("°¡À§"):
-        user = "°¡À§"
+    if col1.button("ê°€ìœ„"):
+        user = "ê°€ìœ„"
 
-    if col2.button("¹ÙÀ§"):
-        user = "¹ÙÀ§"
+    if col2.button("ë°”ìœ„"):
+        user = "ë°”ìœ„"
 
-    if col3.button("º¸"):
-        user = "º¸"
+    if col3.button("ë³´"):
+        user = "ë³´"
 
 
     if user != "":
@@ -59,74 +61,74 @@ with tab1:
 
         result = game(user, computer)
 
-        st.write("³»°¡ ³½ °Í :", user)
-        st.write("ÄÄÇ»ÅÍ°¡ ³½ °Í :", computer)
+        st.write("ë‚´ê°€ ë‚¸ ê²ƒ :", user)
+        st.write("ì»´í“¨í„°ê°€ ë‚¸ ê²ƒ :", computer)
 
-        if result == "½Â¸®":
-            st.success("ÀÌ°å½À´Ï´Ù.")
+        if result == "ìŠ¹ë¦¬":
+            st.success("ì´ê²¼ìŠµë‹ˆë‹¤.")
 
-        elif result == "ÆĞ¹è":
-            st.error("Á³½À´Ï´Ù.")
+        elif result == "íŒ¨ë°°":
+            st.error("ì¡ŒìŠµë‹ˆë‹¤.")
 
         else:
-            st.warning("ºñ°å½À´Ï´Ù.")
+            st.warning("ë¹„ê²¼ìŠµë‹ˆë‹¤.")
 
 
 
 # -------------------------------------------------
-# Teachable Machine ÀÌ¹ÌÁö ÀÎ½Ä
+# Teachable Machine ì´ë¯¸ì§€ ì¸ì‹
 # -------------------------------------------------
 with tab2:
 
-    st.write("Teachable Machine¿¡¼­ ¸¸µç ¸ğµ¨ ÁÖ¼Ò¸¦ ÀÔ·ÂÇÏ¼¼¿ä.")
+    st.write("Teachable Machineì—ì„œ ë§Œë“  ëª¨ë¸ ì£¼ì†Œë¥¼ ì…ë ¥í•˜ì„¸ìš”.")
 
     model_url = st.text_input(
-        "¸ğµ¨ ÁÖ¼Ò",
+        "ëª¨ë¸ ì£¼ì†Œ",
         placeholder="https://teachablemachine.withgoogle.com/models/xxxxxxxx/"
     )
 
 
     menu = st.radio(
-        "ÀÌ¹ÌÁö ÀÔ·Â ¹æ¹ı",
-        ["Ä«¸Ş¶ó", "ÆÄÀÏ ¾÷·Îµå"]
+        "ì´ë¯¸ì§€ ì…ë ¥ ë°©ë²•",
+        ["ì¹´ë©”ë¼", "íŒŒì¼ ì—…ë¡œë“œ"]
     )
 
 
     image_file = None
 
 
-    if menu == "Ä«¸Ş¶ó":
+    if menu == "ì¹´ë©”ë¼":
 
         image_file = st.camera_input(
-            "°¡À§, ¹ÙÀ§, º¸ »çÁøÀ» ÂïÀ¸¼¼¿ä."
+            "ê°€ìœ„, ë°”ìœ„, ë³´ ì‚¬ì§„ì„ ì°ìœ¼ì„¸ìš”."
         )
 
     else:
 
         image_file = st.file_uploader(
-            "»çÁøÀ» ¼±ÅÃÇÏ¼¼¿ä.",
+            "ì‚¬ì§„ì„ ì„ íƒí•˜ì„¸ìš”.",
             type=["jpg", "jpeg", "png"]
         )
 
 
     if model_url != "" and image_file is not None:
 
-        # ÁÖ¼Ò ¸¶Áö¸·¿¡ / °¡ ¾øÀ¸¸é Ãß°¡
+        # ì£¼ì†Œ ë§ˆì§€ë§‰ì— / ê°€ ì—†ìœ¼ë©´ ì¶”ê°€
         if model_url.endswith("/") == False:
             model_url = model_url + "/"
 
 
-        # ÀÌ¹ÌÁö ÀĞ±â
+        # ì´ë¯¸ì§€ ì½ê¸°
         img = Image.open(image_file)
 
         st.image(
             img,
-            caption="ÀÔ·ÂÇÑ ÀÌ¹ÌÁö",
+            caption="ì…ë ¥í•œ ì´ë¯¸ì§€",
             width=300
         )
 
 
-        # ÀÌ¹ÌÁö¸¦ HTML¿¡¼­ »ç¿ëÇÒ ¼ö ÀÖµµ·Ï º¯È¯
+        # ì´ë¯¸ì§€ë¥¼ HTMLì—ì„œ ì‚¬ìš©í•  ìˆ˜ ìˆë„ë¡ ë³€í™˜
         buffer = BytesIO()
 
         img.save(buffer, format="PNG")
@@ -139,16 +141,16 @@ with tab2:
         img_data = "data:image/png;base64," + img_data
 
 
-        # ÄÄÇ»ÅÍ´Â ·£´ıÀ¸·Î ¼±ÅÃ
+        # ì»´í“¨í„°ëŠ” ëœë¤ìœ¼ë¡œ ì„ íƒ
         computer = random.choice(choice)
 
 
-        # Teachable Machine ¸ğµ¨À» ½ÇÇàÇÏ´Â HTML
+        # Teachable Machine ëª¨ë¸ì„ ì‹¤í–‰í•˜ëŠ” HTML
         html = """
         <div>
 
             <p id="message">
-                ÀÌ¹ÌÁö¸¦ È®ÀÎÇÏ°í ÀÖ½À´Ï´Ù.
+                ì´ë¯¸ì§€ë¥¼ í™•ì¸í•˜ê³  ìˆìŠµë‹ˆë‹¤.
             </p>
 
             <img
@@ -218,20 +220,20 @@ with tab2:
                 }
 
 
-                // ¿µ¾î·Î ÇĞ½ÀÇÑ °æ¿ì ÇÑ±Û·Î º¯°æ
+                // ì˜ì–´ë¡œ í•™ìŠµí•œ ê²½ìš° í•œê¸€ë¡œ ë³€ê²½
                 if(name.toLowerCase() == "scissors")
                 {
-                    name = "°¡À§";
+                    name = "ê°€ìœ„";
                 }
 
                 if(name.toLowerCase() == "rock")
                 {
-                    name = "¹ÙÀ§";
+                    name = "ë°”ìœ„";
                 }
 
                 if(name.toLowerCase() == "paper")
                 {
-                    name = "º¸";
+                    name = "ë³´";
                 }
 
 
@@ -240,50 +242,50 @@ with tab2:
 
                 if(name == computer)
                 {
-                    gameResult = "¹«½ÂºÎ";
+                    gameResult = "ë¬´ìŠ¹ë¶€";
                 }
 
-                else if(name == "°¡À§" && computer == "º¸")
+                else if(name == "ê°€ìœ„" && computer == "ë³´")
                 {
-                    gameResult = "½Â¸®";
+                    gameResult = "ìŠ¹ë¦¬";
                 }
 
-                else if(name == "¹ÙÀ§" && computer == "°¡À§")
+                else if(name == "ë°”ìœ„" && computer == "ê°€ìœ„")
                 {
-                    gameResult = "½Â¸®";
+                    gameResult = "ìŠ¹ë¦¬";
                 }
 
-                else if(name == "º¸" && computer == "¹ÙÀ§")
+                else if(name == "ë³´" && computer == "ë°”ìœ„")
                 {
-                    gameResult = "½Â¸®";
+                    gameResult = "ìŠ¹ë¦¬";
                 }
 
                 else
                 {
-                    gameResult = "ÆĞ¹è";
+                    gameResult = "íŒ¨ë°°";
                 }
 
 
                 document.getElementById("message").innerHTML =
-                    "ÀÎ½Ä °á°ú : <b>" + name + "</b>";
+                    "ì¸ì‹ ê²°ê³¼ : <b>" + name + "</b>";
 
 
                 document.getElementById("result").innerHTML =
                     "<br>" +
                     text +
                     "<hr>" +
-                    "³» ¼±ÅÃ : " + name +
+                    "ë‚´ ì„ íƒ : " + name +
                     "<br>" +
-                    "ÄÄÇ»ÅÍ ¼±ÅÃ : " + computer +
+                    "ì»´í“¨í„° ì„ íƒ : " + computer +
                     "<br><br>" +
-                    "<b>°ÔÀÓ °á°ú : " + gameResult + "</b>";
+                    "<b>ê²Œì„ ê²°ê³¼ : " + gameResult + "</b>";
 
             }
 
             catch(error)
             {
                 document.getElementById("message").innerHTML =
-                    "¸ğµ¨À» ºÒ·¯¿ÀÁö ¸øÇß½À´Ï´Ù.<br>" + error;
+                    "ëª¨ë¸ì„ ë¶ˆëŸ¬ì˜¤ì§€ ëª»í–ˆìŠµë‹ˆë‹¤.<br>" + error;
             }
         }
 
@@ -326,5 +328,5 @@ with tab2:
     else:
 
         st.info(
-            "¸ğµ¨ ÁÖ¼Ò¿Í ÀÌ¹ÌÁö¸¦ ÀÔ·ÂÇØÁÖ¼¼¿ä."
+            "ëª¨ë¸ ì£¼ì†Œì™€ ì´ë¯¸ì§€ë¥¼ ì…ë ¥í•´ì£¼ì„¸ìš”."
         )
