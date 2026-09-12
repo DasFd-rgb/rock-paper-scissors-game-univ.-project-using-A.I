@@ -80,11 +80,11 @@ with tab1:
 # -------------------------------------------------
 with tab2:
 
-    st.write("Teachable Machine에서 만든 모델 주소를 입력하세요.")
+    st.write("모델 주소.")
 
     model_url = st.text_input(
         "모델 주소",
-        placeholder="https://teachablemachine.withgoogle.com/models/xxxxxxxx/"
+        placeholder="https://teachablemachine.withgoogle.com/models/[...]"
     )
 
 
