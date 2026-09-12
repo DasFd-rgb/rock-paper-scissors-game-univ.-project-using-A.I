@@ -84,297 +84,537 @@ with tab2:
     #_디자인 설명
     st.write("Teachable Machine 모델을 이용하여 가위, 바위, 보를 인식합니다.")
 
-    #_디자인 모델주소 입력
+    # 내가 만든 Teachable Machine 모델 주소
+    # 본인의 실제 모델 주소로 바꾸기
     model_url = "https://teachablemachine.withgoogle.com/models/KJha1lZTS/"
 
+    st.write("사용 중인 모델 :", model_url)
 
-    if model_url != "":
+    html = """
+    <div style="color:white; font-family:sans-serif;">
 
-        # 주소 마지막에 /가 없으면 추가
-        if model_url.endswith("/") == False:
-            model_url = model_url + "/"
+        <h3 style="color:white;">
+            가위바위보 이미지 인식
+        </h3>
+
+        <p id="status" style="color:white;">
+            모델과 카메라를 불러오는 중입니다...
+        </p>
 
 
-        # 컴퓨터 가위바위보 선택
-        computer = random.choice(choice)
+        <!-- 웹캠 화면 -->
+        <div id="webcam-container"></div>
+
+        <br>
+
+        <!-- 화면 캡처 버튼 -->
+        <button
+            type="button"
+            onclick="captureImage()"
+            style="
+                padding:8px 20px;
+                font-size:15px;
+                cursor:pointer;
+            "
+        >
+            화면 캡처
+        </button>
+
+        <br><br>
 
 
-        # Teachable Machine에서 제공하는 코드를
-        # Streamlit에서 실행하기 위해 HTML 문자열로 작성
-        html = """
-        <div>
-            <h3>가위바위보 이미지 인식</h3>
+        <!-- 캡처한 화면 -->
+        <canvas
+            id="capture-canvas"
+            width="200"
+            height="200"
+            style="
+                display:none;
+                border:1px solid white;
+            "
+        >
+        </canvas>
 
-            <button type="button" onclick="init()">
-                카메라 시작
-            </button>
 
-            <br><br>
+        <br>
 
-            <div id="webcam-container"></div>
 
-            <br>
-
-            <div id="result"></div>
-
-            <br>
-
-            <div id="label-container"></div>
+        <!-- 결과 출력 -->
+        <div
+            id="camera-result"
+            style="
+                color:white;
+                font-size:17px;
+                line-height:1.7;
+            "
+        >
         </div>
 
 
-        <!-- TensorFlow.js -->
-        <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
-
-        <!-- Teachable Machine 이미지 라이브러리 -->
-        <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
+        <hr style="margin-top:30px; margin-bottom:30px;">
 
 
-        <script type="text/javascript">
+        <!-- 파일 업로드 -->
+        <h3 style="color:white;">
+            이미지 파일 업로드
+        </h3>
 
-        // Teachable Machine에서 만든 모델 주소
-        const URL = "MODEL_URL";
-
-
-        // 모델과 웹캠에 사용할 변수
-        let model;
-        let webcam;
-        let labelContainer;
-        let maxPredictions;
-
-
-        // 컴퓨터의 가위바위보 선택
-        const computer = "COMPUTER";
+        <input
+            type="file"
+            id="file-input"
+            accept="image/png, image/jpeg"
+            style="color:white;"
+        >
 
 
-        // -------------------------------------------------
-        // 모델과 카메라 시작
-        // -------------------------------------------------
+        <br><br>
 
-        async function init()
+
+        <!-- 업로드한 사진 표시 -->
+        <img
+            id="upload-image"
+            width="250"
+            style="
+                display:none;
+                border:1px solid white;
+            "
+        >
+
+
+        <br>
+
+
+        <!-- 업로드 결과 -->
+        <div
+            id="upload-result"
+            style="
+                color:white;
+                font-size:17px;
+                line-height:1.7;
+                margin-top:15px;
+            "
+        >
+        </div>
+
+    </div>
+
+
+    <!-- TensorFlow.js -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.20.0/dist/tf.min.js"></script>
+
+
+    <!-- Teachable Machine -->
+    <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8.5/dist/teachablemachine-image.min.js"></script>
+
+
+    <script type="text/javascript">
+
+    // -------------------------------------------------
+    // 변수
+    // -------------------------------------------------
+
+    const URL = "MODEL_URL";
+
+    let model;
+    let webcam;
+    let modelReady = false;
+
+
+    // -------------------------------------------------
+    // 프로그램 시작
+    // -------------------------------------------------
+
+    async function init()
+    {
+        try
         {
             const modelURL = URL + "model.json";
+
             const metadataURL = URL + "metadata.json";
 
 
-            try
-            {
-                // Teachable Machine 모델 불러오기
-                model = await tmImage.load(
-                    modelURL,
-                    metadataURL
-                );
+            // Teachable Machine 모델 불러오기
+            model = await tmImage.load(
+                modelURL,
+                metadataURL
+            );
 
 
-                // 모델의 클래스 개수
-                maxPredictions = model.getTotalClasses();
+            modelReady = true;
 
 
-                // 웹캠 만들기
-                const flip = true;
+            // 웹캠 생성
+            const flip = true;
 
-                webcam = new tmImage.Webcam(
-                    200,
-                    200,
-                    flip
-                );
-
-
-                // 웹캠 사용 준비
-                await webcam.setup();
-
-                // 웹캠 시작
-                await webcam.play();
+            webcam = new tmImage.Webcam(
+                200,
+                200,
+                flip
+            );
 
 
-                // 반복 실행 시작
-                window.requestAnimationFrame(loop);
+            // 카메라 사용 권한 요청
+            await webcam.setup();
+
+            // 카메라 실행
+            await webcam.play();
 
 
-                // 웹캠 화면을 HTML에 추가
-                document
-                    .getElementById("webcam-container")
-                    .appendChild(webcam.canvas);
+            // 웹캠 화면 추가
+            document
+                .getElementById("webcam-container")
+                .appendChild(webcam.canvas);
 
 
-                // 인식 확률을 출력할 공간
-                labelContainer =
-                    document.getElementById("label-container");
+            document.getElementById("status").innerHTML =
+                "카메라가 준비되었습니다. 화면 캡처 버튼을 눌러주세요.";
 
 
-                // 클래스 개수만큼 div 생성
-                for(let i = 0; i < maxPredictions; i++)
-                {
-                    labelContainer.appendChild(
-                        document.createElement("div")
-                    );
-                }
-            }
-
-            catch(error)
-            {
-                document.getElementById("result").innerHTML =
-                    "모델 또는 카메라를 불러오지 못했습니다.<br>" + error;
-            }
-        }
-
-
-        // -------------------------------------------------
-        // 웹캠 화면 반복 실행
-        // -------------------------------------------------
-
-        async function loop()
-        {
-            // 현재 웹캠 화면으로 갱신
-            webcam.update();
-
-
-            // 현재 화면을 AI로 분석
-            await predict();
-
-
-            // 다시 loop 함수 실행
+            // 웹캠 화면 계속 갱신
             window.requestAnimationFrame(loop);
         }
 
-
-        // -------------------------------------------------
-        // 이미지 예측
-        // -------------------------------------------------
-
-        async function predict()
+        catch(error)
         {
-            // 웹캠의 현재 화면을 모델에 입력
-            const prediction =
-                await model.predict(webcam.canvas);
+            document.getElementById("status").innerHTML =
+                "모델 또는 카메라를 불러오지 못했습니다.<br>" +
+                error;
+        }
+    }
 
 
-            let max = 0;
-            let name = "";
+    // -------------------------------------------------
+    // 웹캠 화면 갱신
+    // -------------------------------------------------
+
+    async function loop()
+    {
+        webcam.update();
+
+        window.requestAnimationFrame(loop);
+    }
 
 
-            // 가위, 바위, 보 확률 확인
-            for(let i = 0; i < maxPredictions; i++)
+    // -------------------------------------------------
+    // 컴퓨터 가위바위보 랜덤 선택
+    // -------------------------------------------------
+
+    function computerChoice()
+    {
+        const choice = [
+            "가위",
+            "바위",
+            "보"
+        ];
+
+
+        const num = Math.floor(
+            Math.random() * 3
+        );
+
+
+        return choice[num];
+    }
+
+
+    // -------------------------------------------------
+    // 가장 확률이 높은 가위바위보 찾기
+    // -------------------------------------------------
+
+    async function predict(image)
+    {
+        const prediction =
+            await model.predict(image);
+
+
+        let max = 0;
+
+        let name = "";
+
+        let probabilityText = "";
+
+
+        for(let i = 0; i < prediction.length; i++)
+        {
+            let percent =
+                prediction[i].probability * 100;
+
+
+            probabilityText +=
+                prediction[i].className +
+                " : " +
+                percent.toFixed(1) +
+                "%<br>";
+
+
+            if(prediction[i].probability > max)
             {
-                let percent =
-                    prediction[i].probability * 100;
+                max = prediction[i].probability;
 
-
-                // 각 클래스의 확률 출력
-                const classPrediction =
-                    prediction[i].className +
-                    " : " +
-                    percent.toFixed(1) +
-                    "%";
-
-
-                labelContainer.childNodes[i].innerHTML =
-                    classPrediction;
-
-
-                // 가장 높은 확률 찾기
-                if(prediction[i].probability > max)
-                {
-                    max = prediction[i].probability;
-
-                    name = prediction[i].className;
-                }
+                name = prediction[i].className;
             }
-
-
-            // 영어 클래스 이름으로 학습한 경우
-            // 한글로 변경
-            if(name.toLowerCase() == "scissors")
-            {
-                name = "가위";
-            }
-
-            if(name.toLowerCase() == "rock")
-            {
-                name = "바위";
-            }
-
-            if(name.toLowerCase() == "paper")
-            {
-                name = "보";
-            }
-
-
-            // -------------------------------------------------
-            // 가위바위보 승패 판정
-            // -------------------------------------------------
-
-            let gameResult = "";
-
-
-            if(name == computer)
-            {
-                gameResult = "무승부";
-            }
-
-            else if(name == "가위" && computer == "보")
-            {
-                gameResult = "승리";
-            }
-
-            else if(name == "바위" && computer == "가위")
-            {
-                gameResult = "승리";
-            }
-
-            else if(name == "보" && computer == "바위")
-            {
-                gameResult = "승리";
-            }
-
-            else
-            {
-                gameResult = "패배";
-            }
-
-
-            // -------------------------------------------------
-            // 결과 출력
-            // -------------------------------------------------
-
-            document.getElementById("result").innerHTML =
-                "내 선택 : <b>" + name + "</b>" +
-                "<br>" +
-                "컴퓨터 선택 : <b>" + computer + "</b>" +
-                "<br><br>" +
-                "게임 결과 : <b>" + gameResult + "</b>";
         }
 
-        </script>
-        """
+
+        // 영어로 학습했을 경우
+        if(name.toLowerCase() == "scissors")
+        {
+            name = "가위";
+        }
+
+        else if(name.toLowerCase() == "rock")
+        {
+            name = "바위";
+        }
+
+        else if(name.toLowerCase() == "paper")
+        {
+            name = "보";
+        }
 
 
-        # HTML 코드 안의 MODEL_URL을
-        # 사용자가 입력한 실제 모델 주소로 변경
-        html = html.replace(
-            "MODEL_URL",
-            model_url
+        return {
+            name: name,
+            probability: probabilityText
+        };
+    }
+
+
+    // -------------------------------------------------
+    // 승패 판정
+    // -------------------------------------------------
+
+    function game(user, computer)
+    {
+        if(user == computer)
+        {
+            return "무승부";
+        }
+
+        else if(
+            user == "가위" &&
+            computer == "보"
         )
+        {
+            return "승리";
+        }
 
-
-        # HTML 코드 안의 COMPUTER를
-        # 컴퓨터의 실제 선택으로 변경
-        html = html.replace(
-            "COMPUTER",
-            computer
+        else if(
+            user == "바위" &&
+            computer == "가위"
         )
+        {
+            return "승리";
+        }
 
-
-        #_디자인 HTML 화면 출력
-        components.html(
-            html,
-            height=650
+        else if(
+            user == "보" &&
+            computer == "바위"
         )
+        {
+            return "승리";
+        }
+
+        else
+        {
+            return "패배";
+        }
+    }
 
 
-    else:
+    // -------------------------------------------------
+    // 웹캠 화면 캡처
+    // -------------------------------------------------
 
-        #_디자인 안내문
-        st.info(
-            "Teachable Machine 모델 주소를 입력해주세요."
-        )
+    async function captureImage()
+    {
+        if(modelReady == false)
+        {
+            return;
+        }
+
+
+        const canvas =
+            document.getElementById("capture-canvas");
+
+
+        const context =
+            canvas.getContext("2d");
+
+
+        // 현재 웹캠 화면을 canvas에 복사
+        context.drawImage(
+            webcam.canvas,
+            0,
+            0,
+            200,
+            200
+        );
+
+
+        // 캡처 이미지 표시
+        canvas.style.display = "block";
+
+
+        // 캡처된 이미지를 AI 모델로 분석
+        const result =
+            await predict(canvas);
+
+
+        // 캡처할 때마다 컴퓨터 선택 변경
+        const computer =
+            computerChoice();
+
+
+        const gameResult =
+            game(result.name, computer);
+
+
+        document.getElementById(
+            "camera-result"
+        ).innerHTML =
+
+            "<br>" +
+
+            "<b>AI 분석 결과</b><br>" +
+
+            result.probability +
+
+            "<br>" +
+
+            "내 선택 : <b>" +
+            result.name +
+            "</b><br>" +
+
+            "컴퓨터 선택 : <b>" +
+            computer +
+            "</b><br><br>" +
+
+            "게임 결과 : <b>" +
+            gameResult +
+            "</b>";
+    }
+
+
+    // -------------------------------------------------
+    // 이미지 파일 업로드
+    // -------------------------------------------------
+
+    document
+        .getElementById("file-input")
+        .addEventListener(
+            "change",
+
+            function(event)
+            {
+                const file =
+                    event.target.files[0];
+
+
+                if(file == null)
+                {
+                    return;
+                }
+
+
+                const reader =
+                    new FileReader();
+
+
+                reader.onload =
+                    function(e)
+                    {
+                        const image =
+                            document.getElementById(
+                                "upload-image"
+                            );
+
+
+                        image.src =
+                            e.target.result;
+
+
+                        image.style.display =
+                            "block";
+
+
+                        image.onload =
+                            async function()
+                            {
+                                if(modelReady == false)
+                                {
+                                    return;
+                                }
+
+
+                                // 업로드 이미지 분석
+                                const result =
+                                    await predict(image);
+
+
+                                // 사진을 새로 업로드할 때마다
+                                // 컴퓨터 선택도 새로 생성
+                                const computer =
+                                    computerChoice();
+
+
+                                const gameResult =
+                                    game(
+                                        result.name,
+                                        computer
+                                    );
+
+
+                                document.getElementById(
+                                    "upload-result"
+                                ).innerHTML =
+
+                                    "<b>AI 분석 결과</b><br>" +
+
+                                    result.probability +
+
+                                    "<br>" +
+
+                                    "내 선택 : <b>" +
+                                    result.name +
+                                    "</b><br>" +
+
+                                    "컴퓨터 선택 : <b>" +
+                                    computer +
+                                    "</b><br><br>" +
+
+                                    "게임 결과 : <b>" +
+                                    gameResult +
+                                    "</b>";
+                            };
+                    };
+
+
+                reader.readAsDataURL(file);
+            }
+        );
+
+
+    // -------------------------------------------------
+    // 페이지가 실행되면 자동으로 카메라 시작
+    // -------------------------------------------------
+
+    init();
+
+    </script>
+    """
+
+
+    # 모델 주소 넣기
+    html = html.replace(
+        "MODEL_URL",
+        model_url
+    )
+
+
+    #_디자인 HTML 출력
+    components.html(
+        html,
+        height=1000,
+        scrolling=True
+    )
