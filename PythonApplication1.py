@@ -85,10 +85,7 @@ with tab2:
     st.write("Teachable Machine 모델을 이용하여 가위, 바위, 보를 인식합니다.")
 
     #_디자인 모델주소 입력
-    model_url = st.text_input(
-        "모델 주소",
-        placeholder="https://teachablemachine.withgoogle.com/models/xxxxxxxx/"
-    )
+    model_url = "https://teachablemachine.withgoogle.com/models/KJha1lZTS/"
 
 
     if model_url != "":
